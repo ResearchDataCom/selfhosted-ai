@@ -1,0 +1,22 @@
+services:
+  pgvector:
+    environment:
+      POSTGRES_PASSWORD: xFOJpseTQnQYN
+      LITELLM_PASSWORD: sMk81xKccqqR
+      OPENWEBUI_PASSWORD: Q1KSktvC4X5u
+
+  litellm:
+    environment:
+      DATABASE_URL: postgresql://litellm:sMk81xKccqqR@pgvector:5432/litellm
+      LITELLM_MASTER_KEY: My5IvBvZ7C6hDGhCV8HNmL
+
+  redis:
+    command: --requirepass 2dG8qao88qo1M9wyNL
+
+  openwebui:
+    environment:
+      DATABASE_URL: postgresql://openwebui:Q1KSktvC4X5u@pgvector:5432/openwebui
+      WEBUI_SECRET_KEY: NVNIaFDZFhJ9fCWPIXzt
+      OPENAI_API_KEY: My5IvBvZ7C6hDGhCV8HNmL
+      RAG_OPENAI_API_KEY: My5IvBvZ7C6hDGhCV8HNmL
+      REDIS_URL: redis://:2dG8qao88qo1M9wyNL@redis:6379/0

@@ -1,0 +1,101 @@
+services:
+  adminer:
+    image: adminer
+    networks:
+      - llm-stack
+    ports:
+      - 8081:8080
+
+  pgvector:
+    image: pgvector/pgvector:pg17
+    networks:
+      - llm-stack
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - pgvector:/var/lib/postgresql/data
+      - type: bind
+        source: docker-entrypoint-initdb.d
+        target: /docker-entrypoint-initdb.d
+    ports:
+      - 127.0.0.1:5432:5432
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:0.9.6
+    networks:
+      - llm-stack
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - 127.0.0.1:11434:11434
+    depends_on:
+      pgvector:
+        condition: service_healthy
+
+  litellm:
+    image: ghcr.io/berriai/litellm:v1.74.0-stable
+    command: --config /etc/litellm/litellm-config.yml
+    networks:
+      - llm-stack
+    environment:
+      PORT: 4000
+      STORE_MODEL_IN_DB: True
+    volumes:
+      - type: bind
+        source: litellm-config.yml
+        target: /etc/litellm/litellm-config.yml
+    ports:
+      - 4000:4000
+
+  redis:
+    image: redis:8.0
+    networks:
+      - llm-stack
+    volumes:
+      - redis:/data
+    ports:
+      - 127.0.0.1:6379:6379
+
+  tika:
+    image: apache/tika:3.2.1.0
+    networks:
+      - llm-stack
+    ports:
+      - 127.0.0.1:9998:9998
+
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:v0.6.18
+    networks:
+      - llm-stack
+    environment:
+      VECTOR_DB: pgvector
+      ENABLE_WEB_SEARCH: True
+      WEB_SEARCH_ENGINE: duckduckgo
+      ENABLE_OLLAMA_API: False
+      OPENAI_API_BASE_URL: http://litellm:4000
+      CONTENT_EXTRACTION_ENGINE: tika
+      TIKA_SERVER_URL: http://tika:9998
+      ENABLE_COMMUNITY_SHARING: False
+      ENABLE_MESSAGE_RATING: False
+      ENABLE_FOLLOW_UP_GENERATION: False
+      ENABLE_EVALUATION_ARENA_MODELS: False
+      TASK_MODEL: my-gemini-2.5-flash
+      TASK_MODEL_EXTERNAL: my-gemini-2.5-flash
+      RAG_EMBEDDING_ENGINE: openai
+      RAG_OPENAI_API_BASE_URL: http://litellm:4000
+      RAG_EMBEDDING_MODEL: my-bge-m3:567m
+    ports:
+      - 8080:8080
+
+networks:
+  llm-stack:
+
+volumes:
+  ollama:
+  pgvector:
+  redis:
