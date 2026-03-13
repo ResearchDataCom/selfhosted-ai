@@ -1,3 +1,2 @@
 # Do not track changes to deployer-customized configuration files.
 compose.override.yaml
-litellm-config.yml
