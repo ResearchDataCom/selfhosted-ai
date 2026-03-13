@@ -1,13 +1,14 @@
 services:
   pgvector:
     environment:
-      POSTGRES_PASSWORD: xFOJpseTQnQYN
       LITELLM_PASSWORD: sMk81xKccqqR
       OPENWEBUI_PASSWORD: Q1KSktvC4X5u
+      POSTGRES_PASSWORD: xFOJpseTQnQYN
 
   litellm:
     environment:
       DATABASE_URL: postgresql://litellm:sMk81xKccqqR@pgvector:5432/litellm
+      GOOGLE_API_KEY: AIzaSyD9gG1lj6VdxYZmOwXc3fD4A5yDk9wSDF
       LITELLM_MASTER_KEY: My5IvBvZ7C6hDGhCV8HNmL
 
   redis:
@@ -16,7 +17,50 @@ services:
   openwebui:
     environment:
       DATABASE_URL: postgresql://openwebui:Q1KSktvC4X5u@pgvector:5432/openwebui
-      WEBUI_SECRET_KEY: NVNIaFDZFhJ9fCWPIXzt
       OPENAI_API_KEY: My5IvBvZ7C6hDGhCV8HNmL
       RAG_OPENAI_API_KEY: My5IvBvZ7C6hDGhCV8HNmL
       REDIS_URL: redis://:2dG8qao88qo1M9wyNL@redis:6379/0
+      WEBUI_SECRET_KEY: NVNIaFDZFhJ9fCWPIXzt
+
+configs:
+  litellm:
+    content: |
+      model_list:
+        - model_name: my-llama3.2:1b
+          litellm_params:
+            model: ollama/llama3.2:1b
+            api_base: http://ollama:11434
+            input_cost_per_token: 0
+            output_cost_per_token: 0
+            temperature: 0.2
+        - model_name: my-bge-m3:567m
+          litellm_params:
+            model: ollama/bge-m3:567m
+            api_base: http://ollama:11434
+            input_cost_per_token: 0
+            output_cost_per_token: 0
+        - model_name: my-qwen2.5-coder
+          litellm_params:
+            model: ollama/qwen2.5-coder:latest
+            api_base: http://ollama:11434
+            input_cost_per_token: 0
+            output_cost_per_token: 0
+        - model_name: my-gemini-2.5-pro
+          litellm_params:
+            model: gemini/gemini-2.5-pro
+            api_key: os.environ/GOOGLE_API_KEY
+            input_cost_per_token: 0.00000125
+            output_cost_per_token: 0.00001
+        - model_name: my-gemini-2.5-flash
+          litellm_params:
+            model: gemini/gemini-2.5-flash
+            api_key: os.environ/GOOGLE_API_KEY
+            input_cost_per_token: 0.0000003
+            output_cost_per_token: 0.0000025
+
+      general_settings:
+        enforce_user_param: False
+
+# Local Variables:
+# mode: yaml
+# End:

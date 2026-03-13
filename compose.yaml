@@ -1,15 +1,17 @@
 services:
-  adminer:
-    image: adminer
+  ollama:
+    image: ollama/ollama:0.17.7
     networks:
-      - llm-stack
+      - selfhosted-ai
+    volumes:
+      - ollama:/root/.ollama
     ports:
-      - 8081:8080
+      - 127.0.0.1:11434:11434
 
   pgvector:
     image: pgvector/pgvector:pg17
     networks:
-      - llm-stack
+      - selfhosted-ai
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
@@ -21,57 +23,56 @@ services:
       - 127.0.0.1:5432:5432
     healthcheck:
       test: pg_isready -U postgres
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
-  ollama:
-    image: ollama/ollama:0.9.6
+  adminer:
+    image: adminer
     networks:
-      - llm-stack
-    volumes:
-      - ollama:/root/.ollama
+      - selfhosted-ai
     ports:
-      - 127.0.0.1:11434:11434
-    depends_on:
-      pgvector:
-        condition: service_healthy
+      - 8081:8080
 
   litellm:
-    image: ghcr.io/berriai/litellm:v1.74.0-stable
+    image: ghcr.io/berriai/litellm:v1.82.0-stable
     command: --config /etc/litellm/litellm-config.yml
     networks:
-      - llm-stack
+      - selfhosted-ai
     environment:
       PORT: 4000
       STORE_MODEL_IN_DB: True
-    volumes:
-      - type: bind
-        source: litellm-config.yml
+    configs:
+      - source: litellm
         target: /etc/litellm/litellm-config.yml
+        uid: "0"
+        gid: "0"
+        mode: 0o444
     ports:
       - 4000:4000
+    depends_on:
+      ollama:
+        condition: service_healthy
+      pgvector:
+        condition: service_healthy
 
   redis:
-    image: redis:8.0
+    image: redis:8.6.1
     networks:
-      - llm-stack
+      - selfhosted-ai
     volumes:
       - redis:/data
     ports:
       - 127.0.0.1:6379:6379
 
   tika:
-    image: apache/tika:3.2.1.0
+    image: apache/tika:3.2.3.0
     networks:
-      - llm-stack
+      - selfhosted-ai
     ports:
       - 127.0.0.1:9998:9998
 
   openwebui:
     image: ghcr.io/open-webui/open-webui:v0.6.18
     networks:
-      - llm-stack
+      - selfhosted-ai
     environment:
       VECTOR_DB: pgvector
       ENABLE_WEB_SEARCH: True
@@ -91,9 +92,18 @@ services:
       RAG_EMBEDDING_MODEL: my-bge-m3:567m
     ports:
       - 8080:8080
+    depends_on:
+      pgvector:
+        condition: service_healthy
+      litellm:
+        condition: service_started
+      redis:
+        condition: service_started
+      tika:
+        condition: service_started
 
 networks:
-  llm-stack:
+  selfhosted-ai:
 
 volumes:
   ollama:

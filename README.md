@@ -19,16 +19,11 @@ Alternatives include [Jan.ai](https://jan.ai/),
 
 ## Quick Start
 
-1. Copy `compose.override.yaml.example` to `compose.override.yaml` and
-   `litellm-config.yml.example` to `litellm-config.yml`.
-
-```sh
-for f in compose.override.yaml litellm-config.yml; do
-    cp $f.example $f
-done
-```
+1. Copy `compose.override.yaml.example` to `compose.override.yaml`.
 
 2. Change the passwords and secret keys in `compose.override.yaml`.
+   Customize the list of models and their corresponding settings in
+   the `litellm` configuration.
 
 3. Start the `ollama` service and install the desired models.
 
@@ -39,10 +34,7 @@ docker compose exec ollama ollama pull bge-m3:567m
 docker compose exec ollama ollama pull qwen2.5-coder:latest
 ```
 
-4. Customize the list of installed models and corresponding
-   configuration parameters in `litellm-config.yml`.
-
-5. Start the remaining services.
+4. Start the remaining services.
 
 ```sh
 docker compose up -d
@@ -62,9 +54,11 @@ Accessing the GPU from a container requires additional configuration:
 
 - [Virtualization.framework](https://developer.apple.com/documentation/virtualization)
   on Apple Silicon Macs does not support hardware GPU pass-through.
-  However, some virtual machine monitors provide a Vulkan GPU API
-  within virtual machines.  For more information, refer to
-  [GPU-Accelerated Containers for M1/M2/M3/M4... Macs](https://medium.com/@andreask_75652/gpu-accelerated-containers-for-m1-m2-m3-macs-237556e5fe0b).
+  Some virtual machine monitors provide a Vulkan GPU API within
+  virtual machines,
+  cf. [GPU-Accelerated Containers for M1/M2/M3/M4... Macs](https://medium.com/@andreask_75652/gpu-accelerated-containers-for-m1-m2-m3-macs-237556e5fe0b).
+  Alternatively, run Ollama on the host, connecting to models via
+  `http://host.docker.internal:11434`.
 
 ## Additional Resources
 
