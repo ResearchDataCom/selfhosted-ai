@@ -43,6 +43,7 @@ services:
     depends_on:
       ollama:
         condition: service_healthy
+        required: false
       pgvector:
         condition: service_healthy
 

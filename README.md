@@ -1,13 +1,14 @@
 # Self-hosted AI
 
-This runs large language models (LLMs) locally via Docker Compose per
+Run large language models (LLMs) locally via Docker Compose per
 _Implementing Opensource LLMs in Research Computing_ at PEARC'25:
 
 - [slides and video](https://bit.ly/csim-pearc25)
 
 - [supporting materials](https://dartgo.org/pearc25-llm)
 
-Alternatives include [Jan.ai](https://jan.ai/),
+Alternatives include [Ollama](https://ollama.com/),
+[vMLX](https://vmlx.net/), [Jan.ai](https://jan.ai/),
 [LLMStack](https://llmstack.ai/), and [LocalAI](https://localai.io/).
 
 > [!CAUTION]
@@ -46,19 +47,49 @@ docker compose up -d
 ## Limitations
 
 Good model performance requires access to a graphics processor (GPU).
-Accessing the GPU from a container requires additional configuration:
+Accessing the GPU from a container requires additional configuration.
+This may be as simple as adding `gpu` to the `ollama` service's list
+of capabilities.  For more information, refer to
+[Run Docker Compose services with GPU access](https://docs.docker.com/compose/how-tos/gpu-support/).
 
-- At a minimum, add `gpu` to the `ollama` service's list of
-  capabilities.  For more information, refer to
-  [Run Docker Compose services with GPU access](https://docs.docker.com/compose/how-tos/gpu-support/).
+[Virtualization.framework](https://developer.apple.com/documentation/virtualization)
+on Apple Silicon Macs does not support hardware GPU pass-through.
+Some virtual machine monitors provide a Vulkan GPU API within virtual
+machines,
+cf. [GPU-Accelerated Containers for M1/M2/M3/M4... Macs](https://medium.com/@andreask_75652/gpu-accelerated-containers-for-m1-m2-m3-macs-237556e5fe0b).
+Alternatively, run Ollama on the host.  This requires connecting the
+LiteLLM Proxy Server to the Ollama API endpoint via a container
+runtime-specific hostname or IP address such as `host.docker.internal`
+or `172.17.0.1`,
+cf. [Docker Container Host Access](https://eastondev.com/blog/en/posts/dev/20251217-docker-host-access/),
+[OpenAI-Compatible Endpoints](https://docs.litellm.ai/docs/providers/openai_compatible).
 
-- [Virtualization.framework](https://developer.apple.com/documentation/virtualization)
-  on Apple Silicon Macs does not support hardware GPU pass-through.
-  Some virtual machine monitors provide a Vulkan GPU API within
-  virtual machines,
-  cf. [GPU-Accelerated Containers for M1/M2/M3/M4... Macs](https://medium.com/@andreask_75652/gpu-accelerated-containers-for-m1-m2-m3-macs-237556e5fe0b).
-  Alternatively, run Ollama on the host, connecting to models via
-  `http://host.docker.internal:11434`.
+[Metal](https://developer.apple.com/metal/) limits the amount of
+[unified memory](https://www.xda-developers.com/apple-silicon-unified-memory/)
+available to an Apple Silicon Mac's GPU, around three quarters of the
+total by default.  Change this limit via the kernel state variable
+`iogpu.wired_limit_mb`, specified in
+[mebibytes (MIB)](https://en.wikipedia.org/wiki/Mebibyte), e.g., a
+value of `122880` would limit the GPU to 120 GiB of unified memory.
+(On macOS Ventura and earlier, change `debug.iogpu.wired_limit`,
+specified in bytes, instead.)
+
+> [!IMPORTANT]
+>
+> When changing `iogpu.wired_limit_mb` (or `debug.iogpu.wired_limit`),
+> reserve some memory for the operating system as otherwise the
+> computer may crash.  Only set the kernel state variable temporarily
+> via the `sysctl` command.  Track memory pressure via
+> [Activity Monitor](https://support.apple.com/guide/activity-monitor/).
+> Reboot to restore the original limit if the system becomes
+> unresponsive.
+
+> [!CAUTION]
+>
+> Changing kernel state variables permanently via `/etc/sysctl.conf`
+> is **NOT RECOMMENDED** because that requires disabling
+> [System Integrity Protection](https://support.apple.com/en-us/102149),
+> an important security feature of macOS.
 
 ## Additional Resources
 

@@ -1,4 +1,10 @@
 services:
+  # # Disable Ollama when running it on the host, e.g., for direct
+  # # access to the GPU on macOS.
+  # ollama:
+  #   profiles:
+  #     - disabled
+
   pgvector:
     environment:
       LITELLM_PASSWORD: sMk81xKccqqR
@@ -17,6 +23,10 @@ services:
       DATABASE_URL: postgresql://litellm:sMk81xKccqqR@pgvector:5432/litellm
       GOOGLE_API_KEY: AIzaSyD9gG1lj6VdxYZmOwXc3fD4A5yDk9wSDF
       LITELLM_MASTER_KEY: My5IvBvZ7C6hDGhCV8HNmL
+    # # Connect to Ollama running on the host via this hostname
+    # # (requires Docker 20.10 or newer).
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
 
   redis:
     command: --requirepass 2dG8qao88qo1M9wyNL
