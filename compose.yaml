@@ -68,22 +68,26 @@ services:
     networks:
       - selfhosted-ai
     environment:
-      VECTOR_DB: pgvector
-      ENABLE_WEB_SEARCH: True
-      WEB_SEARCH_ENGINE: duckduckgo
-      ENABLE_OLLAMA_API: False
-      OPENAI_API_BASE_URL: http://litellm:4000
+      # cf. https://docs.openwebui.com/reference/env-configuration
+      ANONYMIZED_TELEMETRY: false
       CONTENT_EXTRACTION_ENGINE: tika
-      TIKA_SERVER_URL: http://tika:9998
+      DO_NOT_TRACK: true
       ENABLE_COMMUNITY_SHARING: False
-      ENABLE_MESSAGE_RATING: False
-      ENABLE_FOLLOW_UP_GENERATION: False
       ENABLE_EVALUATION_ARENA_MODELS: False
-      TASK_MODEL: my-gemini-2.5-flash
-      TASK_MODEL_EXTERNAL: my-gemini-2.5-flash
+      ENABLE_FOLLOW_UP_GENERATION: False
+      ENABLE_MESSAGE_RATING: False
+      ENABLE_OLLAMA_API: False
+      ENABLE_WEB_SEARCH: True
+      OPENAI_API_BASE_URL: http://litellm:4000
       RAG_EMBEDDING_ENGINE: openai
+      RAG_EMBEDDING_MODEL: bge-m3:567m
       RAG_OPENAI_API_BASE_URL: http://litellm:4000
-      RAG_EMBEDDING_MODEL: my-bge-m3:567m
+      SCARF_NO_ANALYTICS: true
+      TASK_MODEL_EXTERNAL: gemini-2.5-flash
+      TASK_MODEL: gemini-2.5-flash
+      TIKA_SERVER_URL: http://tika:9998
+      VECTOR_DB: pgvector
+      WEB_SEARCH_ENGINE: duckduckgo
     ports:
       - 8080:8080
     depends_on:
