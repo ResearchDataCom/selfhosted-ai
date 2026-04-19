@@ -39,6 +39,14 @@ services:
       REDIS_URL: redis://:2dG8qao88qo1M9wyNL@redis:6379/0
       WEBUI_SECRET_KEY: NVNIaFDZFhJ9fCWPIXzt
 
+  openclaw:
+    configs:
+      - source: openclaw
+        target: /home/node/.openclaw/openclaw.json
+        uid: "0"
+        gid: "0"
+        mode: 0o444
+
 configs:
   litellm:
     content: |
@@ -72,6 +80,60 @@ configs:
             output_cost_per_token: 0.0000025
       general_settings:
         enforce_user_param: False
+
+  # Test this configuration with
+  # `docker compose run -it --rm openclaw`.
+  openclaw:
+    content: |
+      {
+        "plugins": {
+          "entries": {
+            "litellm": {
+              "enabled": true
+            }
+          }
+        },
+        "models": {
+          "providers": {
+            "litellm": {
+              "baseUrl": "http://litellm:4000",
+              "apiKey": "My5IvBvZ7C6hDGhCV8HNmL",
+              "api": "openai-completions",
+              "models": [
+                {
+                  "id": "qwen3:14b",
+                  "name": "Qwen3-14B-Q4_K_M",
+                  "reasoning": true,
+                  "input": ["text", "image"],
+                  contextWindow: 10000,
+                  maxTokens: 10000,
+                }
+              ]
+            }
+          }
+        },
+        "agents": {
+          "defaults": {
+            "model": {
+              "primary": "litellm/qwen3:14b"
+            },
+          "workspace": "/home/node/.openclaw/workspace"
+          }
+        },
+        "gateway": {
+          "mode": "local",
+          "auth": {
+            "mode": "token",
+            "token": "94454a10a859b5ef1166a83471afdc7ba93ece5c9f32734f"
+          },
+          "controlUi": {
+            "allowedOrigins": [
+              "http://localhost:18789",
+              "http://127.0.0.1:18789"
+            ]
+          }
+        }
+      }
 
 # Local Variables:
 # mode: yaml

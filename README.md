@@ -24,7 +24,7 @@ Alternatives include [Ollama](https://ollama.com/),
 
 2. Change the passwords and secret keys in `compose.override.yaml`.
    Customize the list of models and their corresponding settings in
-   the `litellm` configuration.
+   the `litellm` and `openclaw` configuration files.
 
 3. Start the `ollama` service and install the desired models.
 

@@ -1,0 +1,31 @@
+FROM node:24
+SHELL ["/bin/bash", "-Eeuo", "pipefail", "-c"]
+
+# Install run-time dependencies.
+RUN <<EOF
+    apt-get update
+    apt-get install -y --no-install-recommends tini
+    rm -rf /var/lib/apt/lists/*
+    npm install -g pnpm
+EOF
+
+# Drop root privileges to hinder container escapes.
+ENV OPENCLAW_CONFIG_DIR=/home/node/.openclaw
+ENV OPENCLAW_WORKSPACE_DIR=/home/node/.openclaw/workspace
+ENV PNPM_HOME=/home/node/.pnpm
+ENV PATH=${PNPM_HOME}/bin:${PATH}
+WORKDIR /home/node
+USER node:node
+
+# Install and configure OpenClaw.
+RUN <<EOF
+    pnpm install -g openclaw@2026.5.12
+    openclaw setup
+EOF
+
+# Set up the container's entry point.
+VOLUME ${OPENCLAW_CONFIG_DIR}/agents
+VOLUME ${OPENCLAW_CONFIG_DIR}/logs
+VOLUME ${OPENCLAW_WORKSPACE_DIR}
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["openclaw"]
