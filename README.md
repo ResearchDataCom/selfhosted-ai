@@ -30,9 +30,9 @@ Alternatives include [Ollama](https://ollama.com/),
 
 ```sh
 docker compose up ollama -d
-docker compose exec ollama ollama pull llama3.2:1b
 docker compose exec ollama ollama pull bge-m3:567m
-docker compose exec ollama ollama pull qwen2.5-coder:latest
+docker compose exec ollama ollama pull llama3.2:1b
+docker compose exec ollama ollama pull qwen2.5-coder:7b
 ```
 
 4. Start the remaining services.
@@ -74,7 +74,7 @@ value of `122880` would limit the GPU to 120 GiB of unified memory.
 (On macOS Ventura and earlier, change `debug.iogpu.wired_limit`,
 specified in bytes, instead.)
 
-> [!IMPORTANT]
+> [!CAUTION]
 >
 > When changing `iogpu.wired_limit_mb` (or `debug.iogpu.wired_limit`),
 > reserve some memory for the operating system as otherwise the
@@ -84,7 +84,7 @@ specified in bytes, instead.)
 > Reboot to restore the original limit if the system becomes
 > unresponsive.
 
-> [!CAUTION]
+> [!WARNING]
 >
 > Changing kernel state variables permanently via `/etc/sysctl.conf`
 > is **NOT RECOMMENDED** because that requires disabling
