@@ -9,7 +9,7 @@ services:
       - 127.0.0.1:11434:11434
 
   pgvector:
-    image: pgvector/pgvector:pg17
+    image: pgvector/pgvector:0.8.4-pg17
     networks:
       - selfhosted-ai
     environment:
