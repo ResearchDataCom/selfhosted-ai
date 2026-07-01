@@ -19,7 +19,7 @@ USER node:node
 
 # Install and configure OpenClaw.
 RUN <<EOF
-    pnpm install -g openclaw@2026.5.12
+    pnpm install -g openclaw@2026.6.1
     openclaw setup
 EOF
 
