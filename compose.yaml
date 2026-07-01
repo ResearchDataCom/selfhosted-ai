@@ -64,7 +64,7 @@ services:
       - 127.0.0.1:9998:9998
 
   openwebui:
-    image: ghcr.io/open-webui/open-webui:v0.8.12
+    image: ghcr.io/open-webui/open-webui:v0.10.2
     networks:
       - selfhosted-ai
     environment:
@@ -101,7 +101,7 @@ services:
         condition: service_started
 
   openclaw:
-    image: openclaw:local
+    image: openclaw:local       # NB: version pinned in the Dockerfile
     build:
       context: .
       dockerfile: Dockerfile.openclaw
