@@ -1,6 +1,6 @@
 services:
   ollama:
-    image: ollama/ollama:0.17.7
+    image: ollama/ollama:0.31.1
     networks:
       - selfhosted-ai
     volumes:
